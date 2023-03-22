@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const cities = [] as any;
+export const cities = [''] as any;
 
 const getCities = async (): Promise<void> => {
   try {
@@ -12,7 +12,9 @@ const getCities = async (): Promise<void> => {
         const { records } = res.data.result;
 
         Object.values(records).map((record: any) => {
-          cities.push(record['שם_ישוב'].trim());
+          if (record['שם_ישוב'].trim() !== 'לא רשום') {
+            cities.push(record['שם_ישוב'].trim());
+          }
         });
       })
       .catch((err) => {
