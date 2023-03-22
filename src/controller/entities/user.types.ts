@@ -2,6 +2,6 @@ import { NewUser } from '../../model';
 
 export interface UserSlice {
   user: NewUser;
-  users: {}[];
+  users: NewUser[];
   addUser: (user: {}) => void;
 }

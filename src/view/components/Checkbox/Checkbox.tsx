@@ -1,21 +1,15 @@
 import React from 'react';
 import './Checkbox.style.scss';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { NewUserSchema } from '../../../model';
 
 export interface CheckboxProps {
   label: string;
+  checked: boolean;
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({ label }) => {
-  const { register, handleSubmit } = useForm({
-    resolver: zodResolver(NewUserSchema),
-  });
-
+const Checkbox: React.FC<CheckboxProps> = ({ label, checked }) => {
   return (
     <div className='checkbox-container'>
-      <input type='checkbox' defaultChecked={true} />
+      <input type='checkbox' checked={checked} readOnly={true} />
       <label className='checkbox-form-label'>{label}</label>
     </div>
   );

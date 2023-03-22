@@ -1,24 +1,24 @@
-import React from 'react';
 import './Signup.style.scss';
 import realEstate from '../../assets/real-estate.png';
 import { MainHeader } from '../components/MainHeader';
 import { SubHeader } from '../components/SubHeader';
 import { Input } from '../components/Input';
+import { Checkboxes } from '../components/Checkboxes';
 import { SubmitButton } from '../components/SubmitButton';
-import { Checkbox } from '../components/Checkbox';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NewUserSchema, FormData } from '../../model';
 import { useStore } from '../../controller';
-import { getCity } from '../../utils/getCity';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Select } from '../components/Select';
+import { cities } from '../../utils/getCities';
+import { getAddresses, addresses } from '../../utils/getAddresses';
 
 const Signup: React.FC = () => {
-  const [value, setValue] = useState('');
+  const [fetchedCities, setFetchedCities] = useState([]);
+  const [chosenCity, setChosenCity] = useState('');
 
-  const getValue = (name: any) => {
-    getCity(name.target.value);
-  };
+  getAddresses();
 
   const {
     register,
@@ -28,12 +28,20 @@ const Signup: React.FC = () => {
     resolver: zodResolver(NewUserSchema),
   });
 
-  const { user, users, addUser } = useStore();
+  const { addUser } = useStore();
 
   const submitUserData = (data: FormData) => {
     addUser(data);
-    console.log('user added to global state!', data);
+    alert('User added to global state!');
   };
+
+  useEffect(() => {
+    setFetchedCities(cities);
+  }, [cities]);
+
+  useEffect(() => {
+    getAddresses();
+  }, []);
 
   return (
     <div className='signup'>
@@ -49,8 +57,6 @@ const Signup: React.FC = () => {
             registeredValue='fullName'
             register={register}
             error={errors.fullName && 'שם מלא חייב להכיל לפחות 5 אותיות'}
-            value={null}
-            onChange={null}
           />
           <Input
             className='input-container'
@@ -60,8 +66,6 @@ const Signup: React.FC = () => {
             registeredValue='userId'
             register={register}
             error={errors.userId && 'נא להקיש ת.ז מלאה (כולל ספרת ביקורת)'}
-            value={null}
-            onChange={null}
           />
           <Input
             className='input-container last-input-container'
@@ -71,8 +75,6 @@ const Signup: React.FC = () => {
             registeredValue='birthDate'
             register={register}
             error={errors.birthDate && 'נא להזין תאריך לידה תקין'}
-            value={null}
-            onChange={null}
           />
         </div>
         <SubHeader value='פרטי התקשרות:' />
@@ -85,8 +87,6 @@ const Signup: React.FC = () => {
             registeredValue='phone'
             register={register}
             error={errors.phone && 'נא להזין מספר נייד תקין'}
-            value={null}
-            onChange={null}
           />
           <Input
             className='input-container'
@@ -96,33 +96,32 @@ const Signup: React.FC = () => {
             registeredValue='email'
             register={register}
             error={errors.email && 'נא להזין כתובת מייל תקינה'}
-            value={null}
-            onChange={null}
           />
         </div>
         <SubHeader value='כתובת:' />
         <div className='inputs-wrapper'>
-          <Input
-            className='input-container'
-            type='text'
+          <Select
+            className='select-container'
             label='עיר:'
             mandatory={true}
             registeredValue='city'
             register={register}
             error={errors.city && 'נא להזין עיר תקינה'}
-            value={value}
-            onChange={getValue}
+            options={cities}
+            onChange={(e: any) => {
+              setChosenCity(e.target.value);
+            }}
           />
-          <Input
-            className='input-container'
-            type='text'
+
+          <Select
+            className='select-container'
             label='רחוב:'
             mandatory={true}
             registeredValue='street'
             register={register}
             error={errors.street && 'נא להזין רחוב תקין'}
-            value={value}
             onChange={null}
+            options={addresses[chosenCity]}
           />
           <Input
             className='input-container last-input-container small-input-container'
@@ -132,14 +131,9 @@ const Signup: React.FC = () => {
             registeredValue='houseNumber'
             register={register}
             error={errors.houseNumber && "נא להזין מס' בית תקין"}
-            value={value}
-            onChange={null}
           />
         </div>
-        <div className='checkboxes-wrapper'>
-          <Checkbox label='אני מסכים לקבל דיוור במייל ובמסרון' />
-          <Checkbox label='אני מסכים לתנאי השירות' />
-        </div>
+        <Checkboxes />
         <SubmitButton className='submit-button' />
       </form>
       <img src={realEstate} alt='' className='signup-form-image' />
